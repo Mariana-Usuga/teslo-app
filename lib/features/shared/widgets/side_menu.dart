@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:teslo_shop/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
-class SideMenu extends StatefulWidget {
+import '../../auth/presentation/login_form_bloc/login_form_bloc.dart';
+
+class SideMenu extends ConsumerStatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
 
   const SideMenu({super.key, required this.scaffoldKey});
 
   @override
-  State<SideMenu> createState() => _SideMenuState();
+  _SideMenuState createState() => _SideMenuState();
 }
 
-class _SideMenuState extends State<SideMenu> {
+class _SideMenuState extends ConsumerState<SideMenu> {
   int navDrawerIndex = 0;
 
   @override
@@ -58,10 +61,10 @@ class _SideMenuState extends State<SideMenu> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: CustomFilledButton(
                 onPressed: () {
-                  context.read<AuthBloc>().logout();
+                  ref.watch(authBlocProvider).logout();
                 },
                 text: 'Cerrar sesión'),
-          ),
+          )
         ]);
   }
 }

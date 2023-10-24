@@ -6,15 +6,16 @@ import 'package:teslo_shop/features/auth/infrastructure/infrastructure.dart';
 
 class AuthDataSourceImpl extends AuthDataSource {
   final dio = Dio(
-      BaseOptions(baseUrl: 'http://192.168.20.42:3000/api' //Environment.apiUrl,
-          //baseUrl: 'http://localhost:3000/api';
-          ));
+      //BaseOptions(baseUrl: 'http://192.168.20.42:3000/api' //Environment.apiUrl,
+      //baseUrl: 'http://localhost:3000/api';
+      );
   //final dio = Dio();
 
   @override
   Future<User> checkAuthStatus(String token) async {
     try {
-      final response = await dio.get('/auth/check-status',
+      final response = await dio.get(
+          'http://10.0.2.2:3000/api/auth/check-status',
           options: Options(headers: {'Authorization': 'Bearer $token'}));
 
       final user = UserMapper.userJsonToEntity(response.data);
@@ -35,8 +36,8 @@ class AuthDataSourceImpl extends AuthDataSource {
     try {
       //print('entra en login, try');
 
-      final response = await dio
-          .post('/auth/login', data: {'email': email, 'password': password});
+      final response = await dio.post('http://10.0.2.2:3000/api/auth/login',
+          data: {'email': email, 'password': password});
       //final d = response.data;
       //print('RESPONSE $response');
       final user = UserMapper.userJsonToEntity(response.data);

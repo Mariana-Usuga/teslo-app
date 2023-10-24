@@ -5,13 +5,17 @@ class LoginFormEvent {
 }
 
 class OnEmailChange extends LoginFormEvent {
-  final Email email;
+  final String email;
 
-  OnEmailChange(this.email);
+  OnEmailChange({required this.email});
 }
 
 class OnPasswordChange extends LoginFormEvent {
-  final Password password;
+  final String password;
 
-  OnPasswordChange(this.password);
+  OnPasswordChange({required this.password});
+}
+
+class FormSubmitted extends LoginFormEvent {
+  FormSubmitted();
 }

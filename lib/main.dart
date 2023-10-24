@@ -4,33 +4,19 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:teslo_shop/config/router/app_router.dart';
 import 'package:teslo_shop/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:teslo_shop/features/auth/presentation/login_form_bloc/login_form_bloc.dart';
 
 import 'config/theme/app_theme.dart';
+import 'features/products/infrastructure/infrastructure.dart';
+import 'features/products/presentation/repo.dart';
 
 //se va al main cuando inicia
 void main() async {
-  final authBloc = AuthBloc();
   await dotenv.load(fileName: '.env');
 
   //await Environment.initEnvironment();
-
+  //final repo = ProductsRepositoryImpl(ProductsDatastoreImpl(accessToken: ''));
   runApp(
-    ProviderScope(
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider.value(
-            value: authBloc,
-          ),
-          BlocProvider(
-            create: (context) => LoginFormBloc(authBloc: authBloc),
-            //create: (context) =>t
-            //  LoginFormBloc(authBloc: context.read<AuthBloc>()),
-          ),
-        ],
-        child: MainApp(),
-      ),
-    ),
+    const ProviderScope(child: MainApp()),
   );
 }
 
@@ -39,7 +25,7 @@ class MainApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //final appRouter = ref.watch(goRouterProvider);
+    final appRouter = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
       routerConfig: appRouter,
