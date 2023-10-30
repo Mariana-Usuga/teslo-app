@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+/*import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
@@ -16,6 +16,7 @@ class GoRouterNotifier extends ChangeNotifier {
   GoRouterNotifier(this._authNotifier) {
     _authNotifier.stream.listen((state) {
       authStatus = state.authStatus;
+      print('authStatus: $authStatus');
     });
   }
 
@@ -25,4 +26,4 @@ class GoRouterNotifier extends ChangeNotifier {
     _authStatus = value;
     notifyListeners();
   }
-}
+}*/

@@ -7,11 +7,16 @@ import 'package:teslo_shop/features/shared/shared.dart';
 
 import '../otherForm/bloc/product_bloc.dart';
 
-class ProductScreen extends ConsumerWidget {
+class ProductScreen extends StatefulWidget {
   final String productId;
 
   const ProductScreen({super.key, required this.productId});
 
+  @override
+  State<ProductScreen> createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends State<ProductScreen> {
   void showSnackbar(BuildContext context) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context)
@@ -19,45 +24,54 @@ class ProductScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final productState = ref.watch(productBlocProvider(productId));
+  void initState() {
+    super.initState();
+
+    context.read<ProductBloc>().add(GetProductById(widget.productId));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final productBloc = context.read<ProductBloc>();
 
     return Scaffold(
         appBar: AppBar(
           title: Text('Editar Producto'),
         ),
         body: BlocBuilder<ProductBloc, ProductState>(
-            bloc: productState,
-            builder: (context, state) => productState.state.product != null
+            bloc: productBloc,
+            builder: (context, state) => productBloc.state.product != null
                 ? _ProductView(
-                    product: productState.state.product!, id: productId)
+                    product: productBloc.state.product!, id: widget.productId)
                 : Text('Cargando..')),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            ref
+            /*ref
                 .read(productFormBlocProvider(productState.state.product!)
                     .notifier)
                 .onFormSubmit()
                 .then((value) {
               if (!value) return;
               showSnackbar(context);
-            });
+            });*/
           },
           child: const Icon(Icons.save_as_outlined),
         ));
   }
 }
 
-class _ProductView extends ConsumerWidget {
+class _ProductView extends StatelessWidget {
   final Product product;
   final String id;
 
   const _ProductView({required this.product, required this.id});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final textStyles = Theme.of(context).textTheme;
-    final productFormBloc = ref.watch(productFormBlocProvider(product));
+    final productFormBloc = context.read<ProductFormBloc>();
+
+    //final productFormBloc = ref.watch(productFormBlocProvider(product));
 
     return //BlocProvider<ProductFormBloc>(
         //create: (context) => ProductFormBloc(product: product),
@@ -70,7 +84,7 @@ class _ProductView extends ConsumerWidget {
         ),
         const SizedBox(height: 10),
         Center(
-            child: Text(productFormBloc.title.value,
+            child: Text(productFormBloc.state.title.value,
                 style: textStyles.titleSmall)),
         const SizedBox(height: 10),
         _ProductInformation(product: product, id: id),
@@ -89,8 +103,7 @@ class _ProductInformation extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productFormBloc = ref
-        .watch(productFormBlocProvider(product)); // Obtener el ProductFormBloc
+    final productFormBloc = context.read<ProductFormBloc>();
 
     return //BlocProvider<ProductFormBloc>(
         //create: (context) => ProductFormBloc(product: product),
@@ -104,10 +117,8 @@ class _ProductInformation extends ConsumerWidget {
           CustomProductField(
             isTopField: true,
             label: 'Titulo',
-            initialValue: productFormBloc.title.value,
-            onChanged: ref
-                .read(productFormBlocProvider(product).notifier)
-                .onTitleChanged,
+            initialValue: productFormBloc.state.title.value,
+            onChanged: (value) => productFormBloc.add(TitleChanged(value)),
             errorMessage: productFormBloc.title.errorMessage,
           ),
           CustomProductField(
@@ -285,181 +296,3 @@ class _ImageGallery extends StatelessWidget {
     );
   }
 }
-
-
-/**  
- * class ProductScreen extends StatefulWidget {
-  final String productId;
-  const ProductScreen({super.key, required this.productId});
-
-  @override
-  State<ProductScreen> createState() => _ProductScreenState();
-}
-
-class _ProductScreenState extends State<ProductScreen> {
-  @override
-  void initState() {
-    print('entrae en INIt');
-    super.initState();
-    final dataBloc = BlocProvider.of<ProductBloc>(context);
-    dataBloc.add(GetProductById(widget.productId));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    //final productForm = context.read<ProductFormBloc>();
-    //productBloc.add(GetProductById(widget.productId));
-    //final productFormBloc = ProductFormBloc();
-    //context.read<ProductFormBloc>().onTitleChanged
-
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Producto'),
-        ),
-        body: Other(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            //final dataBloc = BlocProvider.of<ProductFormBloc>(context);
-
-            //dataBloc.add(SubmitForm());
-          },
-          child: const Icon(Icons.save_as_outlined),
-        ));
-  }
-}
-
-class Other extends StatelessWidget {
-  const Other();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: BlocBuilder<ProductBloc, ProductState>(
-          builder: (context, state) {
-            if (state is DataLoading) {
-              return CircularProgressIndicator();
-            } else if (state is ProductLoaded) {
-              return _ProductView(product: state.product);
-            } else if (state is DataError) {
-              return Text('Error: ${state.error}');
-            }
-            return Text('paso algo');
-          },
-        ));
-  }
-}
-
-class _ProductView extends StatelessWidget {
-  final Product product;
-
-  const _ProductView({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    final textStyles = Theme.of(context).textTheme;
-
-    return BlocProvider<ProductFormBloc>(
-      create: (context) => ProductFormBloc(product: product),
-      child: ListView(
-        children: [
-          SizedBox(
-            height: 250,
-            width: 600,
-            child: _ImageGallery(images: product.images),
-          ),
-          const SizedBox(height: 10),
-          Center(child: Text(product.title, style: textStyles.titleSmall)),
-          const SizedBox(height: 10),
-          _ProductInformation(product: product),
-          // Aquí puedes mostrar los detalles del producto obtenidos de snapshot.data
-          Text('Detalle: '),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProductInformation extends ConsumerWidget {
-  final Product product;
-  const _ProductInformation({required this.product});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final productForm = context.watch<ProductFormBloc>().state;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Generales'),
-          const SizedBox(height: 15),
-          CustomProductField(
-            isTopField: true,
-            label: 'Nombre',
-            initialValue: productForm.title.value,
-            onChanged: context.read<ProductFormBloc>().onTitleChanged,
-            errorMessage: productForm.title.errorMessage,
-          ),
-          CustomProductField(
-            //isTopField: true,
-            label: 'Slug',
-            initialValue: productForm.slug.value,
-            onChanged: context.read<ProductFormBloc>().onSlugChanged,
-            errorMessage: productForm.slug.errorMessage,
-          ),
-          CustomProductField(
-            isBottomField: true,
-            label: 'Precio',
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            initialValue: productForm.price.value.toString(),
-            onChanged: (value) =>
-                context.read<ProductFormBloc>().onPriceChanged(
-                      double.tryParse(value) ?? -1,
-                    ),
-            errorMessage: productForm.price.errorMessage,
-          ),
-          const SizedBox(height: 15),
-          const Text('Extras'),
-          _SizeSelector(
-              selectedSizes: productForm.sizes,
-              onSizesChanged: context.read<ProductFormBloc>().onSizeChanged),
-          const SizedBox(height: 5),
-          _GenderSelector(
-              selectedGender: productForm.gender,
-              onGendersChanged:
-                  context.read<ProductFormBloc>().onGenderChanged),
-          const SizedBox(height: 15),
-          CustomProductField(
-            isTopField: true,
-            label: 'Existencias',
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            initialValue: productForm.inStock.value.toString(),
-            onChanged: (value) => context
-                .read<ProductFormBloc>()
-                .onStockChanged(int.tryParse(value) ?? -1),
-            errorMessage: productForm.inStock.errorMessage,
-          ),
-          CustomProductField(
-            maxLines: 6,
-            label: 'Descripción',
-            keyboardType: TextInputType.multiline,
-            initialValue: product.description,
-            onChanged: context.read<ProductFormBloc>().onDescriptionChanged,
-          ),
-          CustomProductField(
-            isBottomField: true,
-            maxLines: 2,
-            label: 'Tags (Separados por coma)',
-            keyboardType: TextInputType.multiline,
-            initialValue: product.tags.join(', '),
-            onChanged: context.read<ProductFormBloc>().onTagsChanged,
-          ),
-          const SizedBox(height: 100),
-        ],
-      ),
-    );
-  }
-}
- */

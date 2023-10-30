@@ -1,68 +1,59 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:teslo_shop/features/auth/auth.dart';
 import 'package:teslo_shop/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:teslo_shop/features/products/products.dart';
 
-import 'app_router_notifier.dart';
-
-final goRouterProvider = Provider((ref) {
-  final goRouterNotifier = ref.read(goRouterNotifierProvider);
-
-  return GoRouter(
-    initialLocation: '/splash',
-    refreshListenable: goRouterNotifier,
-    routes: [
-      ///* Primera pantalla
-      GoRoute(
-        path: '/splash',
-        builder: (context, state) => const CheckAuthStatusScreen(),
+final _publicRouter = GoRouter(
+  initialLocation: '/splash',
+  routes: [
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => CheckAuthStatusScreen(),
+    ),
+    GoRoute(
+      path: '/',
+      builder: (context, state) => ProductsScreen(),
+    ),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => LoginScreen(),
+    ),
+    GoRoute(
+      path: '/product/:id', // /product/new
+      builder: (context, state) => ProductScreen(
+        productId: state.params['id'] ?? 'no-id',
       ),
+    ),
+  ],
+);
 
-      ///* Auth Routes
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterScreen(),
-      ),
+class RouterSimpleCubit extends Cubit<GoRouter> {
+  final AuthBloc authBloc;
 
-      ///* Product Routes
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const ProductsScreen(),
-      ),
-      GoRoute(
-        path: '/product/:id', // /product/new
-        builder: (context, state) => ProductScreen(
-          productId: state.params['id'] ?? 'no-id',
-        ),
-      ),
-    ],
-    redirect: (context, state) {
-      final isGoingTo = state.subloc;
-      final authStatus = goRouterNotifier.authStatus;
+  RouterSimpleCubit(this.authBloc) : super(_publicRouter);
 
-      if (isGoingTo == '/splash' && authStatus == AuthStatus.checking)
-        return null;
+  void checkAuthStatusAndRedirect(
+    BuildContext context,
+  ) async {
+    final completer = Completer<void>();
 
-      if (authStatus == AuthStatus.notAuthenticated) {
-        if (isGoingTo == '/login' || isGoingTo == '/register') return null;
+    authBloc.add(ChangeAuthStatus());
 
-        return '/login';
-      }
+    //authBloc.stream.listen((authStats) {
+    //final authStatus = authState.authStatus;
 
-      if (authStatus == AuthStatus.authenticated) {
-        if (isGoingTo == '/login' ||
-            isGoingTo == '/register' ||
-            isGoingTo == '/splash') {
-          return '/';
-        }
-      }
+    return completer.future;
+  }
 
-      return null;
-    },
-  );
-});
+  void goProductsScreen() {
+    state.go('/');
+  }
+
+  void goLogin() {
+    state.go('/login');
+  }
+}

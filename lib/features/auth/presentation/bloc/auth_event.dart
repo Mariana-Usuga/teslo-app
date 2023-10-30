@@ -17,8 +17,12 @@ class RegisterUser extends AuthEvent {
   RegisterUser(this.password);
 }
 
-class ChangeAuthStatus extends AuthEvent {
-  final AuthStatus newStatus;
+class LogoutUser extends AuthEvent {
+  final String? errorMessage;
 
-  ChangeAuthStatus(this.newStatus);
+  LogoutUser({this.errorMessage = ''});
+}
+
+class ChangeAuthStatus extends AuthEvent {
+  ChangeAuthStatus();
 }

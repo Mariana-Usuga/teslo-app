@@ -6,3 +6,7 @@ class ProductsEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class LoadNextPage extends ProductsEvent {
+  const LoadNextPage();
+}

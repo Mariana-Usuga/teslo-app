@@ -23,6 +23,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
   Widget build(BuildContext context) {
     final hasNotch = MediaQuery.of(context).viewPadding.top > 35;
     final textStyles = Theme.of(context).textTheme;
+    final authBloc = context.read<AuthBloc>();
 
     return NavigationDrawer(
         elevation: 1,
@@ -61,7 +62,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: CustomFilledButton(
                 onPressed: () {
-                  ref.watch(authBlocProvider).logout();
+                  authBloc.add(LogoutUser());
                 },
                 text: 'Cerrar sesión'),
           )

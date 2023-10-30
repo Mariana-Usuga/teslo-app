@@ -5,7 +5,7 @@ import 'package:teslo_shop/features/products/presentation/otherForm/bloc/product
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../infrastructure/infrastructure.dart';
 
-final productRepositoryProvider = Provider<ProductsRepository>((ref) {
+/*final productRepositoryProvider = Provider<ProductsRepository>((ref) {
   // final accessToken = ref.watch(authBlocProvider).user?.token ?? '';
   final t = ref.watch(authBlocProvider).state.user!.token;
   print('TOKEN EN REPOSITORY PROVIDER $t');
@@ -15,7 +15,7 @@ final productRepositoryProvider = Provider<ProductsRepository>((ref) {
     ProductsDatastoreImpl(accessToken: accessToken),
   );
   return productRepository;
-});
+});*/
 
 /*final productBlocProvider = BlocProvider<ProductBloc>((ref) {
   final repository = ref.watch(productRepositoryProvider);

@@ -30,7 +30,31 @@ class SlugChanged extends ProductFormEvent {
 }
 
 class StockChanged extends ProductFormEvent {
-  final int slug;
+  final int inStock;
 
-  StockChanged(this.slug);
+  StockChanged(this.inStock);
+}
+
+class SizeChanged extends ProductFormEvent {
+  final List<String> sizes;
+
+  SizeChanged(this.sizes);
+}
+
+class GenderChanged extends ProductFormEvent {
+  final String gender;
+
+  GenderChanged(this.gender);
+}
+
+class DescriptionChanged extends ProductFormEvent {
+  final String description;
+
+  DescriptionChanged(this.description);
+}
+
+class TagsChanged extends ProductFormEvent {
+  final String tags;
+
+  TagsChanged(this.tags);
 }

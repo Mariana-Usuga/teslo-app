@@ -7,7 +7,7 @@ import 'errors/product_errors.dart';
 
 class ProductsDatastoreImpl extends ProductsDatasource {
   late final Dio dio; //late para configurar despues
-  final String accessToken;
+  final String? accessToken;
 
   ProductsDatastoreImpl({required this.accessToken}) : dio = Dio();
   /*ProductsDatastoreImpl({required this.accessToken}) : dio = Dio(BaseOptions(

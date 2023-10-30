@@ -35,36 +35,27 @@ class ProductsScreen extends StatelessWidget {
   }
 }
 
-class _ProductsView extends ConsumerStatefulWidget {
+class _ProductsView extends StatefulWidget {
   const _ProductsView();
 
   @override
-  _ProductsViewState createState() => _ProductsViewState();
+  State<_ProductsView> createState() => _ProductsViewState();
 }
 
-class _ProductsViewState extends ConsumerState {
+class _ProductsViewState extends State<_ProductsView> {
   final ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
 
-    scrollController.addListener(() {
-      if ((scrollController.position.pixels + 400) >=
-          scrollController.position.maxScrollExtent) {
-        //ref.read(productBlocProvider.notifier).loadNextPage();
-      }
-    });
-    _loadProducts();
-  }
-
-  Future<void> _loadProducts() async {
-    final productsBloc = ref.read(productsBlocProvider);
-    // await productsBloc.loadNextPage();
-
-    /*setState(() {
-      isLoading = false;
-    });*/
+    //scrollController.addListener(() {
+    //if ((scrollController.position.pixels + 400) >=
+    //  scrollController.position.maxScrollExtent) {
+    //ref.read(productBlocProvider.notifier).loadNextPage();
+    //}
+    //});
+    context.read<ProductsBloc>().add(LoadNextPage());
   }
 
   @override
@@ -75,10 +66,10 @@ class _ProductsViewState extends ConsumerState {
 
   @override
   Widget build(BuildContext context) {
-    final productsState = ref.watch(productsBlocProvider);
+    final productsBloc = context.read<ProductsBloc>();
 
     return BlocBuilder<ProductsBloc, ProductsState>(
-        bloc: productsState,
+        bloc: productsBloc,
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -88,9 +79,9 @@ class _ProductsViewState extends ConsumerState {
               crossAxisCount: 2,
               mainAxisSpacing: 20,
               crossAxisSpacing: 35,
-              itemCount: productsState.state.products.length,
+              itemCount: productsBloc.state.products.length,
               itemBuilder: (context, index) {
-                final product = productsState.state.products[index];
+                final product = productsBloc.state.products[index];
                 return GestureDetector(
                     onTap: () => context.push('/product/${product.id}'),
                     child: ProductCard(product: product));
@@ -100,106 +91,3 @@ class _ProductsViewState extends ConsumerState {
         });
   }
 }
-
-  
-
-/**
- * 
- * FutureBuilder(
-          future: context.read<ProductsBlocBloc>().loadNextPage(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else {
-              final state = context.read<ProductsBlocBloc>().state;
-
-              return MasonryGridView.count(
-                controller: scrollController,
-                physics: const BouncingScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 35,
-                itemCount: state.products.length,
-                itemBuilder: (context, index) {
-                  final product = state.products[index];
-
-                  return GestureDetector(
-                      onTap: () => context.push('/product/${product.id}'),
-                      child: ProductCard(product: product));
-                },
-              );
-            }
-          }),
- */
-/*import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:go_router/go_router.dart';
-import 'package:teslo_shop/features/shared/shared.dart';
-
-import '../../domain/entities/product.dart';
-import '../productsBloc/products_bloc_bloc.dart';
-import '../widgets/product_card.dart';
-
-class ProductsScreen extends StatelessWidget {
-  const ProductsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final scaffoldKey = GlobalKey<ScaffoldState>();
-
-    return Scaffold(
-      drawer: SideMenu(scaffoldKey: scaffoldKey),
-      appBar: AppBar(
-        title: const Text('Products'),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search_rounded))
-        ],
-      ),
-      body: _ProductsView(),
-      floatingActionButton: FloatingActionButton.extended(
-        label: const Text('Nuevo producto'),
-        icon: const Icon(Icons.add),
-        onPressed: () {},
-      ),
-    );
-  }
-}
-
-class _ProductsView extends StatelessWidget {
-  _ProductsView();
-
-  final ScrollController scrollController = ScrollController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: FutureBuilder(
-          future: context.read<ProductsBlocBloc>().loadNextPage(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else {
-              final state = context.read<ProductsBlocBloc>().state;
-
-              return MasonryGridView.count(
-                controller: scrollController,
-                physics: const BouncingScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 35,
-                itemCount: state.products.length,
-                itemBuilder: (context, index) {
-                  final product = state.products[index];
-
-                  return GestureDetector(
-                      onTap: () => context.push('/product/${product.id}'),
-                      child: ProductCard(product: product));
-                },
-              );
-            }
-          }),
-    );
-  }
-}*/
