@@ -50,13 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = await authRepository.checkAuthStatus(token);
 
-        await keyValueStorageService.setKeyValue('token', user.token);
-
-        emit(state.copyWith(
-          user: user,
-          authStatus: AuthStatus.authenticated,
-          errorMessage: '',
-        ));
+        _setLoggedUser(user!);
       } catch (e) {
         add(LogoutUser());
       }
@@ -72,7 +66,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
     });
 
-    on<RegisterUser>((event, emit) async {});
+    on<RegisterUser>((event, emit) async {
+      await Future.delayed(const Duration(milliseconds: 500));
+      print('entra en loginUser despues del delayes');
+
+      try {
+        final user = await authRepository.register(
+            event.email, event.password, event.fullName);
+        _setLoggedUser(user);
+      } on CustomError catch (e) {
+        add(LogoutUser(errorMessage: e.message));
+      } catch (e) {
+        add(LogoutUser(errorMessage: 'Error no controlado!!'));
+      }
+    });
   }
 
   _setLoggedUser(User user) async {

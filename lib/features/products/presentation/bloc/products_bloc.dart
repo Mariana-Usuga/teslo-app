@@ -23,22 +23,59 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         return;
       }
 
-      emit(state.copyWith(
+      emit(
+        state.copyWith(
           isLastPage: false,
           isLoading: false,
           offset: state.offset + 10,
-          products: [...state.products, ...products]));
+          products: [...state.products, ...products],
+        ),
+      );
+      print('state ${state.products}');
+    });
+    on<CreateOrUpdateProduct>((event, emit) async {
+      try {
+        print('entra en createOrUpdateProduct ${event.productLike}');
+        print('entra en createOrUpdateProduct ${state}');
+
+        final product =
+            await productsRepository.createUpdateProduct(event.productLike);
+        final isProductInList = state.products.any((element) {
+          print('element ${element.id}');
+          return element.id == product.id;
+        });
+
+        if (!isProductInList) {
+          emit(state.copyWith(products: [...state.products, product]));
+          //return true;
+        }
+
+        emit(state.copyWith(
+            products: state.products
+                .map(
+                  (element) => (element.id == product.id) ? product : element,
+                )
+                .toList()));
+        print('sta ${state.products}');
+        //return true;
+      } catch (e) {
+        //return false;
+      }
     });
   }
 
   //Future loadNextPage() async {}
 
-  Future<bool> createOrUpdateProduct(Map<String, dynamic> productLike) async {
+  /*createOrUpdateProduct(Map<String, dynamic> productLike) async {
     try {
       print('entra en createOrUpdateProduct ${productLike}');
+      print('entra en createOrUpdateProduct ${state}');
+
       final product = await productsRepository.createUpdateProduct(productLike);
-      final isProductInList =
-          state.products.any((element) => element.id == product.id);
+      final isProductInList = state.products.any((element) {
+        print('element ${element.id}');
+        return element.id == product.id;
+      });
 
       if (!isProductInList) {
         emit(state.copyWith(products: [...state.products, product]));
@@ -51,11 +88,12 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
                 (element) => (element.id == product.id) ? product : element,
               )
               .toList()));
+      print('sta ${state.products}');
       return true;
     } catch (e) {
       return false;
     }
-  }
+  }*/
 }
 /*import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';

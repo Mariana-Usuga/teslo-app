@@ -9,7 +9,7 @@ class AuthRepositoryImpl extends AuthRepository {
       : dataSource = dataSource ?? AuthDataSourceImpl();
 
   @override
-  Future<User> checkAuthStatus(String token) {
+  Future<User?> checkAuthStatus(String token) {
     return dataSource.checkAuthStatus(token);
   }
 

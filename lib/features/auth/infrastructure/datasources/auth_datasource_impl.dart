@@ -1,21 +1,20 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:teslo_shop/config/config.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:teslo_shop/features/auth/domain/domain.dart';
 import 'package:teslo_shop/features/auth/infrastructure/infrastructure.dart';
 //import 'package:teslo_shop/features/auth/infrastructure/infrastructure.dart';
 
 class AuthDataSourceImpl extends AuthDataSource {
-  final dio = Dio(
-      //BaseOptions(baseUrl: 'http://192.168.20.42:3000/api' //Environment.apiUrl,
-      //baseUrl: 'http://localhost:3000/api';
-      );
-  //final dio = Dio();
-
+  //final client = http.Client();
+  final dio = Dio();
   @override
-  Future<User> checkAuthStatus(String token) async {
+  Future<User?> checkAuthStatus(String token) async {
     try {
-      final response = await dio.get(
-          'http://10.0.2.2:3000/api/auth/check-status',
+      final response = await dio.get('${Environment.apiUrl}/auth/check-status',
           options: Options(headers: {'Authorization': 'Bearer $token'}));
 
       final user = UserMapper.userJsonToEntity(response.data);
@@ -35,13 +34,10 @@ class AuthDataSourceImpl extends AuthDataSource {
   Future<User> login(String email, String password) async {
     try {
       //print('entra en login, try');
-
-      final response = await dio.post('http://10.0.2.2:3000/api/auth/login',
+      final response = await dio.post('${Environment.apiUrl}/auth/login',
           data: {'email': email, 'password': password});
-      //final d = response.data;
-      //print('RESPONSE $response');
-      final user = UserMapper.userJsonToEntity(response.data);
 
+      final user = UserMapper.userJsonToEntity(response.data);
       return user;
     } on DioError catch (e) {
       final u = e.response;
@@ -57,15 +53,37 @@ class AuthDataSourceImpl extends AuthDataSource {
 
       throw Exception();
     } catch (e) {
-      print('entra en ERROR dio');
-
-      throw Exception();
+      print('e $e');
+      throw CustomError('err ${e}');
     }
   }
 
   @override
-  Future<User> register(String email, String password, String fullName) {
-    // TODO: implement register
-    throw UnimplementedError();
+  Future<User> register(String email, String password, String fullName) async {
+    throw Exception();
+    /*try {
+      print('entra en login, try');
+
+      final response = await client.post(
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        Uri.parse('${Environment.apiUrl}/auth/register'),
+        body: jsonEncode(
+            {'email': email, 'password': password, 'fullName': fullName}),
+      );
+      final responseJson = json.decode(response.body);
+      //final d = response.data;
+      print('RESPONSE $response');
+
+      if (responseJson['data'] == null) {
+        throw CustomError(responseJson['message']);
+      }
+      final user = UserMapper.userJsonToEntity(responseJson);
+
+      return user;
+    } catch (e) {
+      throw CustomError('Credenciales incorrectas $e');
+    } */
   }
 }

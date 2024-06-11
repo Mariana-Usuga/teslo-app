@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:teslo_shop/features/products/domain/domain.dart';
+import 'package:teslo_shop/features/products/presentation/bloc/products_bloc.dart';
 import 'package:teslo_shop/features/products/presentation/forms/bloc/product_form_bloc.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
@@ -17,6 +18,10 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
+  late Future<void> _loadProductFuture;
+  late ProductFormBloc productFormBloc;
+  late ProductsBloc productsBloc;
+  late Product product;
   void showSnackbar(BuildContext context) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context)
@@ -27,33 +32,56 @@ class _ProductScreenState extends State<ProductScreen> {
   void initState() {
     super.initState();
 
+    _loadProductFuture = _loadProduct();
+  }
+
+  Future<void> _loadProduct() async {
+    productsBloc = context.read<ProductsBloc>();
+    print('entra en _loadProduct ${productsBloc}');
+
+    productFormBloc = context.read<ProductFormBloc>();
     context.read<ProductBloc>().add(GetProductById(widget.productId));
+    // Espera a que el estado del ProductBloc se actualice con el producto.
+    await context.read<ProductBloc>().stream.firstWhere((state) {
+      product = state.product!;
+      productFormBloc.add(LoadedProduct(state.product!));
+
+      return state.product != null;
+    });
+    //print('productFormBloc ${productFormBloc.state}');
+    print('entra en _loadProduct ${productsBloc}');
   }
 
   @override
   Widget build(BuildContext context) {
     final productBloc = context.read<ProductBloc>();
+    final productFormBloc = context.read<ProductFormBloc>();
+    final products = context.read<ProductsBloc>();
 
     return Scaffold(
         appBar: AppBar(
           title: Text('Editar Producto'),
+          leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios,
+              ),
+              onPressed: () =>
+                  //print('print en editar producto ${products.state}'),
+                  GoRouter.of(context).pop()),
         ),
         body: BlocBuilder<ProductBloc, ProductState>(
             bloc: productBloc,
-            builder: (context, state) => productBloc.state.product != null
-                ? _ProductView(
-                    product: productBloc.state.product!, id: widget.productId)
-                : Text('Cargando..')),
+            builder: (context, state) {
+              if (productBloc.state.product != null) {
+                return _ProductView(
+                    product: productBloc.state.product!, id: widget.productId);
+              }
+              return Text('Cargando..');
+            }),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            /*ref
-                .read(productFormBlocProvider(productState.state.product!)
-                    .notifier)
-                .onFormSubmit()
-                .then((value) {
-              if (!value) return;
-              showSnackbar(context);
-            });*/
+            productFormBloc.add(SubmitForm(productsBloc));
+            print('productFormBloc ${productFormBloc.state}');
           },
           child: const Icon(Icons.save_as_outlined),
         ));
@@ -69,13 +97,8 @@ class _ProductView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyles = Theme.of(context).textTheme;
-    final productFormBloc = context.read<ProductFormBloc>();
 
-    //final productFormBloc = ref.watch(productFormBlocProvider(product));
-
-    return //BlocProvider<ProductFormBloc>(
-        //create: (context) => ProductFormBloc(product: product),
-        ListView(
+    return ListView(
       children: [
         SizedBox(
           height: 250,
@@ -83,31 +106,40 @@ class _ProductView extends StatelessWidget {
           child: _ImageGallery(images: product.images),
         ),
         const SizedBox(height: 10),
-        Center(
-            child: Text(productFormBloc.state.title.value,
-                style: textStyles.titleSmall)),
+        Center(child: Text(product.title, style: textStyles.titleSmall)),
         const SizedBox(height: 10),
         _ProductInformation(product: product, id: id),
-        // Aquí puedes mostrar los detalles del producto obtenidos de snapshot.data
-        Text('Detalle: '),
       ],
     );
   }
 }
 
-class _ProductInformation extends ConsumerWidget {
+class _ProductInformation extends StatefulWidget {
   final Product product;
   final String id;
 
   const _ProductInformation({required this.id, required this.product});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<_ProductInformation> createState() => _ProductInformationState();
+}
+
+class _ProductInformationState extends State<_ProductInformation> {
+  @override
+  void initState() {
+    super.initState();
+
+    //context.read<ProductFormBloc>().add(LoadedProduct(widget.product));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final productFormBloc = context.read<ProductFormBloc>();
 
-    return //BlocProvider<ProductFormBloc>(
-        //create: (context) => ProductFormBloc(product: product),
-        Padding(
+    /* return BlocBuilder<ProductFormBloc, ProductFormState>(
+        bloc: productFormBloc,
+        builder: (context, state) {*/
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,94 +151,82 @@ class _ProductInformation extends ConsumerWidget {
             label: 'Titulo',
             initialValue: productFormBloc.state.title.value,
             onChanged: (value) => productFormBloc.add(TitleChanged(value)),
-            errorMessage: productFormBloc.title.errorMessage,
+            errorMessage: productFormBloc.state.title.errorMessage,
           ),
           CustomProductField(
             label: 'Slug',
-            initialValue: productFormBloc.slug.value,
-            onChanged: ref
-                .read(productFormBlocProvider(product).notifier)
-                .onSlugChanged,
-            errorMessage: productFormBloc.slug.errorMessage,
+            initialValue: productFormBloc.state.slug.value,
+            onChanged: (value) => productFormBloc.add(SlugChanged(value)),
+            errorMessage: productFormBloc.state.slug.errorMessage,
           ),
           CustomProductField(
             isBottomField: true,
             label: 'Precio',
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => ref
-                .read(productFormBlocProvider(product).notifier)
-                .onPriceChanged(double.tryParse(value) ?? -1),
-            /*(value) =>
-                context.read<ProductFormBloc>().onPriceChanged(
-                      double.tryParse(value) ?? -1,
-                    )*/
-            errorMessage: productFormBloc.price.errorMessage,
+            initialValue: productFormBloc.state.price.value.toString(),
+            onChanged: (value) =>
+                productFormBloc.add(PriceChanged(double.tryParse(value) ?? -1)),
+            errorMessage: productFormBloc.state.price.errorMessage,
           ),
           const SizedBox(height: 15),
           const Text('Extras'),
           _SizeSelector(
-            selectedSizes: productFormBloc.sizes,
-            onSizesChanged: ref
-                .read(productFormBlocProvider(product).notifier)
-                .onSizeChanged,
+            selectedSizes: productFormBloc.state.sizes,
+            onSizesChanged: (value) => productFormBloc.add(
+              SizeChanged(value),
+            ),
           ),
           const SizedBox(height: 5),
           _GenderSelector(
-            selectedGender: productFormBloc.gender,
-            onGendersChanged: ref
-                .read(productFormBlocProvider(product).notifier)
-                .onGenderChanged,
+            selectedGender: productFormBloc.state.gender,
+            onGendersChanged: (value) => productFormBloc.add(
+              GenderChanged(value),
+            ),
           ),
           const SizedBox(height: 15),
           CustomProductField(
             isTopField: true,
             label: 'Existencias',
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            initialValue: productFormBloc.inStock.value.toString(),
-            onChanged: (value) => ref
-                .read(productFormBlocProvider(product).notifier)
-                .onStockChanged,
-            /*(value) => context
-                .read<ProductFormBloc>()
-                .onStockChanged(int.tryParse(value) ?? -1),*/
-            errorMessage: productFormBloc.inStock.errorMessage,
+            initialValue: productFormBloc.state.inStock.value.toString(),
+            onChanged: (value) => productFormBloc.add(
+              StockChanged(int.tryParse(value) ?? -1),
+            ),
+            errorMessage: productFormBloc.state.inStock.errorMessage,
           ),
           CustomProductField(
-            maxLines: 6,
-            label: 'Descripción',
-            keyboardType: TextInputType.multiline,
-            initialValue: product.description,
-            onChanged: ref
-                .read(productFormBlocProvider(product).notifier)
-                .onDescriptionChanged,
-          ),
+              maxLines: 6,
+              label: 'Descripción',
+              keyboardType: TextInputType.multiline,
+              initialValue: widget.product.description,
+              onChanged: (value) => productFormBloc.add(
+                    DescriptionChanged(value),
+                  )
+              //.onDescriptionChanged,
+              ),
           CustomProductField(
-            isBottomField: true,
-            maxLines: 2,
-            label: 'Tags (Separados por coma)',
-            keyboardType: TextInputType.multiline,
-            initialValue: product.tags.join(', '),
-            onChanged: ref
-                .read(productFormBlocProvider(product).notifier)
-                .onTagsChanged,
-          ),
+              isBottomField: true,
+              maxLines: 2,
+              label: 'Tags (Separados por coma)',
+              keyboardType: TextInputType.multiline,
+              initialValue: widget.product.tags.join(', '),
+              onChanged: (value) => productFormBloc.add(
+                    TagsChanged(productFormBloc.state.tags),
+                  )
+              //.onTagsChanged,
+              ),
           const SizedBox(height: 100),
-          /*ElevatedButton(
-            onPressed: () {
-              
-              productFormBloc.onFormSubmit();
-            },
-            child: Text('actualizadar'),
-          )*/
         ],
       ),
     );
+    //});
   }
 }
 
 class _SizeSelector extends StatelessWidget {
   final List<String> selectedSizes;
   final List<String> sizes = const ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+  //final Function(String)? onSizesChanged
 
   final void Function(List<String> selectedSizes) onSizesChanged;
 
@@ -215,6 +235,8 @@ class _SizeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productFormBloc = context.read<ProductFormBloc>();
+
     return SegmentedButton(
       emptySelectionAllowed: true,
       showSelectedIcon: false,
@@ -225,6 +247,9 @@ class _SizeSelector extends StatelessWidget {
       }).toList(),
       selected: Set.from(selectedSizes),
       onSelectionChanged: (newSelection) {
+        print('newSelection $newSelection');
+        //productFormBloc.add(SizesChanged(newSelection.toList()));
+        FocusScope.of(context).unfocus();
         onSizesChanged(List.from(newSelection));
       },
       multiSelectionEnabled: true,
@@ -250,6 +275,7 @@ class _GenderSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SegmentedButton(
+        //emptySelectionAllowed: false,
         multiSelectionEnabled: false,
         showSelectedIcon: false,
         style: const ButtonStyle(visualDensity: VisualDensity.compact),

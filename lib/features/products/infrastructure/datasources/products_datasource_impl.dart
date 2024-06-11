@@ -21,8 +21,8 @@ class ProductsDatastoreImpl extends ProductsDatasource {
       final String? productId = productLike['id'];
       final String method = (productId == null) ? 'POST' : 'PATCH';
       final String url = (productId == null)
-          ? 'http://10.0.2.2:3000/api/products'
-          : 'http://10.0.2.2:3000/api/products/$productId';
+          ? '${Environment.apiUrl}/products'
+          : '${Environment.apiUrl}/products/$productId';
 
       productLike.remove('id');
 
@@ -46,7 +46,7 @@ class ProductsDatastoreImpl extends ProductsDatasource {
   Future<Product> getProductById(String id) async {
     try {
       print('entra en getProductById');
-      final response = await dio.get('http://10.0.2.2:3000/api/products/$id');
+      final response = await dio.get('${Environment.apiUrl}/products/$id');
       final product = ProductMapper.jsonToEntity(response.data);
       return product;
     } on DioError catch (e) {
@@ -65,7 +65,7 @@ class ProductsDatastoreImpl extends ProductsDatasource {
     print('entra en getProductsByPage');
     try {
       final response = await dio.get<List>(
-        'http://10.0.2.2:3000/api/products?limit=$limit&offset=$offset',
+        '${Environment.apiUrl}/products?limit=$limit&offset=$offset',
       );
       //final data = response.data;
       //print('después de response $data'); // Agrega este mensaje

@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:teslo_shop/features/products/domain/domain.dart';
 import 'package:teslo_shop/features/products/presentation/otherForm/bloc/product_bloc.dart';
 
-import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../infrastructure/infrastructure.dart';
 
 /*final productRepositoryProvider = Provider<ProductsRepository>((ref) {

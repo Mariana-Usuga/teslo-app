@@ -12,9 +12,11 @@ class LoginUser extends AuthEvent {
 }
 
 class RegisterUser extends AuthEvent {
+  final String email;
+  final String fullName;
   final String password;
 
-  RegisterUser(this.password);
+  RegisterUser(this.email, this.fullName, this.password);
 }
 
 class LogoutUser extends AuthEvent {

@@ -7,7 +7,7 @@ class ProductState {
   final bool isSaving;
 
   ProductState({
-    required this.id,
+    this.id = '0',
     this.product,
     this.isLoading = true,
     this.isSaving = false,

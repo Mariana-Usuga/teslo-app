@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:teslo_shop/features/auth/presentation/bloc/auth_bloc.dart';
 
 class CheckAuthStatusScreen extends StatefulWidget {
   const CheckAuthStatusScreen({super.key});

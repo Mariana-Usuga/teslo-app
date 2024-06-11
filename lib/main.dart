@@ -6,8 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:teslo_shop/config/router/app_router.dart';
 //import 'package:teslo_shop/config/router/app_router.dart';
 import 'package:teslo_shop/features/auth/infrastructure/infrastructure.dart';
-import 'package:teslo_shop/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:teslo_shop/features/auth/presentation/auth/auth_bloc.dart';
+import 'package:teslo_shop/features/auth/presentation/register_form_bloc/register_form_bloc.dart';
 import 'package:teslo_shop/features/products/infrastructure/infrastructure.dart';
+import 'package:teslo_shop/features/products/presentation/forms/bloc/product_form_bloc.dart';
+import 'package:teslo_shop/features/products/presentation/otherForm/bloc/product_bloc.dart';
 
 import 'config/theme/app_theme.dart';
 import 'features/auth/presentation/login_form_bloc/login_form_bloc.dart';
@@ -27,21 +30,34 @@ void main() async {
       authRepository: authRepository,
       keyValueStorageService: keyValueStorageService);
 
-  //final productsBloc =
-  //  ProductsBloc(productsRepository: ProductsRepositoryImpl());
-
   runApp(
     ProviderScope(
       child: MultiBlocProvider(
         providers: [
           BlocProvider<LoginFormBloc>(
               create: (context) => LoginFormBloc(authBloc: authBloc)),
+          BlocProvider<RegisterFormBloc>(
+              create: (context) => RegisterFormBloc(authBloc: authBloc)),
           BlocProvider<AuthBloc>(create: (context) => authBloc),
           BlocProvider<RouterSimpleCubit>(
               create: (context) => RouterSimpleCubit(authBloc)),
           BlocProvider<ProductsBloc>(
               create: (context) =>
                   ProductsBloc(productsRepository: productsRepository)),
+          BlocProvider(
+              create: (context) => ProductBloc(
+                  productsRepository: productsRepository,
+                  productsBloc:
+                      ProductsBloc(productsRepository: productsRepository),
+                  productFormBloc: ProductFormBloc(
+                      productsRepository: productsRepository,
+                      productsBloc: ProductsBloc(
+                          productsRepository: productsRepository)))),
+          BlocProvider(
+              create: (context) => ProductFormBloc(
+                  productsRepository: productsRepository,
+                  productsBloc:
+                      ProductsBloc(productsRepository: productsRepository)))
         ],
         child: MainApp(),
       ),

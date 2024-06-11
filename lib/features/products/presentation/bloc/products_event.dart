@@ -10,3 +10,8 @@ class ProductsEvent extends Equatable {
 class LoadNextPage extends ProductsEvent {
   const LoadNextPage();
 }
+
+class CreateOrUpdateProduct extends ProductsEvent {
+  Map<String, dynamic> productLike;
+  CreateOrUpdateProduct(this.productLike);
+}

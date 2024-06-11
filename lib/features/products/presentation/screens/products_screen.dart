@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
+import 'package:teslo_shop/features/products/presentation/forms/bloc/product_form_bloc.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
 import '../bloc/products_bloc.dart';
@@ -49,12 +49,6 @@ class _ProductsViewState extends State<_ProductsView> {
   void initState() {
     super.initState();
 
-    //scrollController.addListener(() {
-    //if ((scrollController.position.pixels + 400) >=
-    //  scrollController.position.maxScrollExtent) {
-    //ref.read(productBlocProvider.notifier).loadNextPage();
-    //}
-    //});
     context.read<ProductsBloc>().add(LoadNextPage());
   }
 
@@ -83,8 +77,11 @@ class _ProductsViewState extends State<_ProductsView> {
               itemBuilder: (context, index) {
                 final product = productsBloc.state.products[index];
                 return GestureDetector(
-                    onTap: () => context.push('/product/${product.id}'),
-                    child: ProductCard(product: product));
+                  onTap: () {
+                    context.push('/product/${product.id}');
+                  },
+                  child: ProductCard(product: product),
+                );
               },
             ),
           );

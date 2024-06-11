@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:teslo_shop/features/auth/presentation/register_form_bloc/register_form_bloc.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -7,7 +9,6 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
     final textStyles = Theme.of(context).textTheme;
 
@@ -20,7 +21,7 @@ class RegisterScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 80),
+            const SizedBox(height: 70),
             // Icon Banner
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -43,8 +44,8 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 50),
 
             Container(
-              height: size.height - 260, // 80 los dos sizebox y 100 el ícono
-              width: double.infinity,
+              //height: size.height - 260, // 80 los dos sizebox y 100 el ícono
+              //width: double.infinity,
               decoration: BoxDecoration(
                 color: scaffoldBackgroundColor,
                 borderRadius:
@@ -65,60 +66,84 @@ class _RegisterForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyles = Theme.of(context).textTheme;
+    final registerFormBloc = context.read<RegisterFormBloc>();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50),
-      child: Column(
-        children: [
-          const SizedBox(height: 50),
-          Text('Nueva cuenta', style: textStyles.titleMedium),
-          const SizedBox(height: 50),
-          const CustomTextFormField(
-            label: 'Nombre completo',
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 30),
-          const CustomTextFormField(
-            label: 'Correo',
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 30),
-          const CustomTextFormField(
-            label: 'Contraseña',
-            obscureText: true,
-          ),
-          const SizedBox(height: 30),
-          const CustomTextFormField(
-            label: 'Repita la contraseña',
-            obscureText: true,
-          ),
-          const SizedBox(height: 30),
-          SizedBox(
-              width: double.infinity,
-              height: 46,
-              child: CustomFilledButton(
-                text: 'Crear',
-                buttonColor: Colors.black,
-                onPressed: () {},
-              )),
-          const Spacer(flex: 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return BlocBuilder<RegisterFormBloc, RegisterFormState>(
+      builder: (context, state) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50),
+          child: Column(
             children: [
-              const Text('¿Ya tienes cuenta?'),
-              TextButton(
-                  onPressed: () {
-                    if (context.canPop()) {
-                      return context.pop();
-                    }
-                    context.go('/login');
-                  },
-                  child: const Text('Ingresa aquí'))
+              const SizedBox(height: 40),
+              Text('Nueva cuenta', style: textStyles.titleMedium),
+              const SizedBox(height: 40),
+              CustomTextFormField(
+                label: 'Nombre completo',
+                keyboardType: TextInputType.text,
+                onChanged: (value) =>
+                    registerFormBloc.add(OnFullNameChange(value)),
+                errorMessage: registerFormBloc.state.isFormPosted
+                    ? registerFormBloc.state.fullName.errorMessage
+                    : null,
+              ),
+              const SizedBox(height: 20),
+              CustomTextFormField(
+                label: 'Correo',
+                keyboardType: TextInputType.emailAddress,
+                onChanged: (value) =>
+                    registerFormBloc.add(OnEmailChange(value)),
+                errorMessage: registerFormBloc.state.isFormPosted
+                    ? registerFormBloc.state.email.errorMessage
+                    : null,
+              ),
+              const SizedBox(height: 20),
+              CustomTextFormField(
+                label: 'Contraseña',
+                obscureText: true,
+                onChanged: (value) =>
+                    registerFormBloc.add(OnPasswordChange(value)),
+                errorMessage: registerFormBloc.state.isFormPosted
+                    ? registerFormBloc.state.password.errorMessage
+                    : null,
+              ),
+              const SizedBox(height: 20),
+              /*const CustomTextFormField(
+                label: 'Repita la contraseña',
+                obscureText: true,
+              ),*/
+              const SizedBox(height: 20),
+              SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: CustomFilledButton(
+                    text: 'Crear',
+                    buttonColor: Colors.black,
+                    onPressed: () {
+                      if (!registerFormBloc.state.isPosting) {
+                        registerFormBloc.add(FormSubmitted());
+                      }
+                    },
+                  )),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('¿Ya tienes cuenta?'),
+                  TextButton(
+                      onPressed: () {
+                        if (context.canPop()) {
+                          return context.pop();
+                        }
+                        context.go('/login');
+                      },
+                      child: const Text('Ingresa aquí'))
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
-          const Spacer(flex: 1),
-        ],
-      ),
+        );
+      },
     );
   }
 }

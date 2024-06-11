@@ -12,19 +12,22 @@ class ProductFormState {
   final String description;
   final String tags;
   final List<String> images;
+  final bool isFormPosted;
 
-  ProductFormState(
-      {this.isFormValid = false,
-      this.id,
-      this.title = const Title.dirty(''),
-      this.slug = const Slug.dirty(''),
-      this.price = const Price.dirty(0),
-      this.sizes = const [],
-      this.gender = 'men',
-      this.inStock = const Stock.dirty(0),
-      this.description = '',
-      this.tags = '',
-      this.images = const []});
+  ProductFormState({
+    this.isFormValid = false,
+    this.id,
+    this.title = const Title.dirty(''),
+    this.slug = const Slug.dirty(''),
+    this.price = const Price.dirty(0),
+    this.sizes = const [],
+    this.gender = '',
+    this.inStock = const Stock.dirty(0),
+    this.description = '',
+    this.tags = '',
+    this.images = const [],
+    this.isFormPosted = false,
+  });
 
   ProductFormState copyWith({
     bool? isFormValid,
@@ -38,6 +41,7 @@ class ProductFormState {
     String? description,
     String? tags,
     List<String>? images,
+    bool? isFormPosted,
   }) =>
       ProductFormState(
         isFormValid: isFormValid ?? this.isFormValid,
@@ -51,5 +55,6 @@ class ProductFormState {
         description: description ?? this.description,
         tags: tags ?? this.tags,
         images: images ?? this.images,
+        isFormPosted: isFormPosted ?? this.isFormPosted,
       );
 }

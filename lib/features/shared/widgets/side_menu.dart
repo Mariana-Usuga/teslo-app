@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:teslo_shop/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:teslo_shop/features/auth/presentation/auth/auth_bloc.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
 
 import '../../auth/presentation/login_form_bloc/login_form_bloc.dart';

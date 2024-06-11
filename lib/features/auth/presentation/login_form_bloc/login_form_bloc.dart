@@ -1,9 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:teslo_shop/features/auth/presentation/auth/auth_bloc.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
-
-import '../bloc/auth_bloc.dart';
 
 part 'login_form_event.dart';
 part 'login_form_state.dart';
@@ -35,7 +34,7 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
       authBloc.add(LoginUser(state.email.value, state.password.value));
 
       emit(state.copyWith(isPosting: false));
-    });
+    } );
   }
 
   _touchEveryField() {

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:teslo_shop/features/auth/presentation/auth/auth_bloc.dart';
 import 'package:teslo_shop/features/auth/presentation/login_form_bloc/login_form_bloc.dart';
 import 'package:teslo_shop/features/shared/shared.dart';
-
-import '../bloc/auth_bloc.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -14,40 +13,38 @@ class LoginScreen extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
-    return //BlocProvider<LoginFormBloc>(
-        //create: (_) => LoginFormBloc(loginUserCallback: createUpdateCallback),
-        GestureDetector(
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: Scaffold(
-                resizeToAvoidBottomInset: true,
-                body: GeometricalBackground(
-                    child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 80),
-                      // Icon Banner
-                      const Icon(
-                        Icons.production_quantity_limits_rounded,
-                        color: Colors.white,
-                        size: 100,
-                      ),
-                      const SizedBox(height: 80),
-
-                      Container(
-                          height: size.height -
-                              260, // 80 los dos sizebox y 100 el ícono
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: scaffoldBackgroundColor,
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(100)),
-                          ),
-                          child: _LoginForm())
-                    ],
+    return GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            body: GeometricalBackground(
+                child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 50),
+                  // Icon Banner
+                  const Icon(
+                    Icons.production_quantity_limits_rounded,
+                    color: Colors.white,
+                    size: 80,
                   ),
-                ))));
+                  const SizedBox(height: 50),
+
+                  Container(
+                      //height: size.height -
+                      //  260, // 80 los dos sizebox y 100 el ícono
+                      // width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: scaffoldBackgroundColor,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(100)),
+                      ),
+                      child: _LoginForm())
+                ],
+              ),
+            ))));
   }
 }
 
@@ -81,29 +78,28 @@ class _LoginForm extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 50),
         child: Column(
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             Text('Login', style: textStyles.titleLarge),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             CustomTextFormField(
               label: 'Correo',
               keyboardType: TextInputType.emailAddress,
-              //onChanged: (value) => loginForm.add(OnEmailChange(email: value)),
               onChanged: (value) => loginFormBloc.add(OnEmailChange(value)),
               errorMessage: loginFormBloc.state.isFormPosted
                   ? loginFormBloc.state.email.errorMessage
                   : null,
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             CustomTextFormField(
               label: 'Contraseña',
               obscureText: true,
               onChanged: (value) => loginFormBloc.add(OnPasswordChange(value)),
-              onFieldSubmitted: (_) => loginFormBloc.add(FormSubmitted()),
+              //onFieldSubmitted: (_) => loginFormBloc.add(FormSubmitted()),
               errorMessage: loginFormBloc.state.isFormPosted
                   ? loginFormBloc.state.password.errorMessage
                   : null,
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -117,7 +113,7 @@ class _LoginForm extends StatelessWidget {
                 },
               ),
             ),
-            const Spacer(flex: 2),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -128,7 +124,7 @@ class _LoginForm extends StatelessWidget {
                 ),
               ],
             ),
-            const Spacer(flex: 1),
+            const SizedBox(height: 20),
           ],
         ),
       );

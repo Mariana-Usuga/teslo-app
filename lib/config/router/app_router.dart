@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:teslo_shop/features/auth/auth.dart';
-import 'package:teslo_shop/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:teslo_shop/features/auth/presentation/auth/auth_bloc.dart';
 import 'package:teslo_shop/features/products/products.dart';
 
 final _publicRouter = GoRouter(
@@ -21,6 +21,10 @@ final _publicRouter = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => LoginScreen(),
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => RegisterScreen(),
     ),
     GoRoute(
       path: '/product/:id', // /product/new

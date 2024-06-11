@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:teslo_shop/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:teslo_shop/features/auth/presentation/auth/auth_bloc.dart';
 
 part 'app_router_event.dart';
 part 'app_router_state.dart';

@@ -8,7 +8,8 @@ class ProductFormEvent extends Equatable {
 }
 
 class SubmitForm extends ProductFormEvent {
-  const SubmitForm();
+  final dynamic products;
+  const SubmitForm(this.products);
 }
 
 class TitleChanged extends ProductFormEvent {
@@ -57,4 +58,10 @@ class TagsChanged extends ProductFormEvent {
   final String tags;
 
   TagsChanged(this.tags);
+}
+
+class LoadedProduct extends ProductFormEvent {
+  final Product product;
+
+  LoadedProduct(this.product);
 }
