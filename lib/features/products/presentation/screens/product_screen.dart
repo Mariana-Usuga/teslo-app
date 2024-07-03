@@ -80,8 +80,23 @@ class _ProductScreenState extends State<ProductScreen> {
             }),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            productFormBloc.add(SubmitForm(productsBloc));
-            print('productFormBloc ${productFormBloc.state}');
+            //productFormBloc.add(SubmitForm(productsBloc));
+            productsBloc.add(CreateOrUpdateProduct({
+              'id': (productFormBloc.state.id == 'new')
+                  ? null
+                  : productFormBloc.state.id,
+              'title': productFormBloc.state.title.value,
+              'price': productFormBloc.state.price.value,
+              'description': productFormBloc.state.description,
+              'slug': productFormBloc.state.slug.value,
+              'stock': productFormBloc.state.inStock.value,
+              'sizes': productFormBloc.state.sizes,
+              'gender': productFormBloc.state.gender,
+              'tags': productFormBloc.state.tags.split(',').toList(),
+              'images': productFormBloc.state.images
+                  .map((e) => e.split('/').last)
+                  .toList(),
+            }));
           },
           child: const Icon(Icons.save_as_outlined),
         ));

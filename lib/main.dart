@@ -73,8 +73,6 @@ class MainApp extends ConsumerWidget {
     final appRouter = context.watch<RouterSimpleCubit>().state;
     final routerCubit = context.read<RouterSimpleCubit>();
 
-    //BlocProvider.of<AuthBloc>(context)..add(ChangeAuthStatus());
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       routerCubit.checkAuthStatusAndRedirect(context);
     });

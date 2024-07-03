@@ -53,11 +53,4 @@ class RouterSimpleCubit extends Cubit<GoRouter> {
     return completer.future;
   }
 
-  void goProductsScreen() {
-    state.go('/');
-  }
-
-  void goLogin() {
-    state.go('/login');
-  }
 }

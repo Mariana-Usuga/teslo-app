@@ -34,10 +34,11 @@ class ProductsDatastoreImpl extends ProductsDatasource {
               'Authorization': 'Bearer $accessToken',
             },
           ));
-
+      print('response ${response.data}');
       final product = ProductMapper.jsonToEntity(response.data);
       return product;
     } catch (e) {
+      print('error ${e}');
       throw Exception();
     }
   }

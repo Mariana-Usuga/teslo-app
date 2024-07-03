@@ -41,7 +41,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
         //return
         print('state ${event}');
 
-        productsBloc.add(CreateOrUpdateProduct(productLike));
+        //productsBloc.add(CreateOrUpdateProduct(productLike));
         //return await Future.value(
         //productsBloc.createOrUpdateProduct(productLike));
         //return await Future.value(

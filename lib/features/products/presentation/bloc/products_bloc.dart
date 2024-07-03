@@ -42,6 +42,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
             await productsRepository.createUpdateProduct(event.productLike);
         final isProductInList = state.products.any((element) {
           print('element ${element.id}');
+
           return element.id == product.id;
         });
 
@@ -49,7 +50,6 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           emit(state.copyWith(products: [...state.products, product]));
           //return true;
         }
-
         emit(state.copyWith(
             products: state.products
                 .map(
